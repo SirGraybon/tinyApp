@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/SirGraybon/tinyApp/issues"
   },
-  "homepage": "https://github.com/SirGraybon/tinyApp#readme"
+  "homepage": "https://github.com/SirGraybon/tinyApp#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
