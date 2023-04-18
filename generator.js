@@ -1,4 +1,4 @@
-generateRandomString = function() {
+const generateRandomString = function() {
   let string =""
   for (let i = 6; i > 0; i--) {
     let setter = Math.floor(Math.random()*3)
@@ -24,4 +24,4 @@ generateRandomString = function() {
   return string
 }
 
-module.exports = {generateRandomString}
+module.exports = { generateRandomString }
