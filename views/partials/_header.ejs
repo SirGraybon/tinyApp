@@ -14,17 +14,16 @@
       
 
           <div class="form-group mb-2">
-            <% if(username) { %>
+            <% if(user) { %>
               <form method="POST" action="/logout">
-                <%= username %>
+                <%= user.email %>
                 <button type="submit" class="btn btn-primary">logout</button>
               </form>
             <% } else { %>
-              <form class="form-inline" action="/login" method="POST">
-                <input class="form-control" type="text" name="username" placeholder="username"
-                style="width: 150px; margin: 1em" />
+              <form class="form-inline" action="/register" method="get">
+
     
-                <button type="submit" class="btn btn-primary">login</button>
+                <button type="submit" class="btn btn-primary">register</button>
               </form>
             <% } %>
            
