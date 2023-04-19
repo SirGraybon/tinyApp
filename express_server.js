@@ -5,6 +5,11 @@ app.use(cookieParser());
 const PORT = 8080;
 //const generateRandomString = require('./generator')
 
+
+///////////////////notes///////////////////////
+// currentUser variable read form cookie
+
+//////////////////////////////////////////////
 const generateRandomString = function() {
   let string = "";
   for (let i = 6; i > 0; i--) {
