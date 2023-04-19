@@ -36,6 +36,15 @@ const generateRandomString = function() {
   }
   return string;
 };
+
+const findUser = function(id) {
+  for (const users in userDb) {
+    if (userDb[users].email === id) {
+      return userDb[users];
+    }
+  }
+  return false
+};
 ///////////////objects///////////////////////
 
 const urlDatabase = {
@@ -61,7 +70,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { urls: urlDatabase, id: req.params.id, longURL: urlDatabase[req.params.id]  };
+  const templateVars = { urls: urlDatabase, id: req.params.id, longURL: urlDatabase[req.params.id] };
   if (req.cookies) {
     templateVars["user"] = userDb[req.cookies["userid"]];
   } else {
@@ -133,9 +142,15 @@ app.post("/urls/:id/edit", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
+  const {email, password} = req.body
+let userid = findUser(email)
+  if (userid === false) {
 
-  res.cookie("username", req.body.username);
-  res.redirect("/urls");
+  res.status(400).send("User not yet registered")
+}
+console.log(userid.email)
+res.cookie("userid", userid.userId);
+res.redirect("/urls");
 });
 
 app.post("/urls", (req, res) => {
@@ -149,26 +164,24 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
-app.post("/register" ,(req,res) => {
-  const {email, password} = req.body
+app.post("/register", (req, res) => {
+  const { email, password } = req.body;
 
   if (!email || !password) {
-    res.status(400).send("please enter email and password")
+    res.status(400).send("please enter email and password");
   }
-  for (const users in userDb) {
-    if (userDb[users].email === email) {
+  if (findUser(email)) {
+    res.status(400).send("User already exists");
+  }
 
-      res.status(400).send("User already exists")
-    }
-  }
-  const userId = generateRandomString()
+  const userId = generateRandomString();
   userDb[userId] = {
     userId: userId,
     email,
-    password, 
-  } 
+    password,
+  };
   res.cookie("userid", userId);
-  res.redirect("/urls")
+  res.redirect("/urls");
 
 })
 
