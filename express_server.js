@@ -56,8 +56,8 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-
-  let templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], }
+const user = req.cookies["username"] || null
+  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id],  }
   if (req.cookies) {
     console.log("cookies")
     templateVars["username"] = req.cookies["username"];
