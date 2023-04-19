@@ -79,6 +79,15 @@ app.get("/register", (req, res) => {
   }
   res.render("register", templateVars);
 });
+app.get("/login", (req, res) => {
+  const templateVars = { urls: urlDatabase };
+  if (req.cookies) {
+    templateVars["user"] = userDb[req.cookies["userid"]];
+  } else {
+    templateVars["user"] = null;
+  }
+  res.render("login", templateVars);
+});
 
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
@@ -142,6 +151,16 @@ app.post("/logout", (req, res) => {
 
 app.post("/register" ,(req,res) => {
   const {email, password} = req.body
+
+  if (!email || !password) {
+    res.status(400).send("please enter email and password")
+  }
+  for (const users in userDb) {
+    if (userDb[users].email === email) {
+
+      res.status(400).send("User already exists")
+    }
+  }
   const userId = generateRandomString()
   userDb[userId] = {
     userId: userId,
