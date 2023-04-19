@@ -43,7 +43,7 @@ const findUser = function(id) {
       return userDb[users];
     }
   }
-  return false
+  return false;
 };
 ///////////////objects///////////////////////
 
@@ -142,15 +142,19 @@ app.post("/urls/:id/edit", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  const {email, password} = req.body
-let userid = findUser(email)
+  const { email, password } = req.body;
+  let userid = findUser(email);
   if (userid === false) {
 
-  res.status(400).send("User not yet registered")
-}
-console.log(userid.email)
-res.cookie("userid", userid.userId);
-res.redirect("/urls");
+    res.status(403).send("User not yet registered");
+  }
+  if (userid.password !== password) {
+    res.status(403).send("incorrect password");
+  }
+  if (userid.password === password) {
+    res.cookie("userid", userid.userId);
+    res.redirect("/urls");
+  }
 });
 
 app.post("/urls", (req, res) => {
@@ -161,7 +165,7 @@ app.post("/urls", (req, res) => {
 
 app.post("/logout", (req, res) => {
   res.clearCookie("userid");
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 app.post("/register", (req, res) => {
