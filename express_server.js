@@ -1,7 +1,7 @@
 const express = require('express');
-var cookieParser = require('cookie-parser')
+var cookieParser = require('cookie-parser');
 const app = express();
-app.use(cookieParser())
+app.use(cookieParser());
 const PORT = 8080;
 //const generateRandomString = require('./generator')
 
@@ -42,22 +42,31 @@ app.listen(PORT, () => {
 
 //////////////////GET//////////////////////////
 
-app.get('/', (req, res) => {
-  res.send("Hello!");
-});
+
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {}
+  if (req.cookies) {
+    templateVars["username"] = req.cookies["username"];
+  } else {
+    templateVars["username"] = null;
+  }
+  
+  res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
 
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
-  res.render("urls_show", templateVars);
-});
+  let templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], }
+  if (req.cookies) {
+    console.log("cookies")
+    templateVars["username"] = req.cookies["username"];
+  }  else {
+    console.log("no cookies")
+    templateVars["username"] = null;
+  }
 
-app.get('/hello', (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
+  res.render("urls_show", templateVars);
 });
 
 app.get("/u/:id", (req, res) => {
@@ -66,14 +75,14 @@ app.get("/u/:id", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = {urls: urlDatabase};
-  console.log("test");
-  if(req.cookies){
-    templateVars["username"] =  req.cookies["username"]
+  const templateVars = { urls: urlDatabase };
+console.log(req.cookies)
+  if (req.cookies) {
+    templateVars["username"] = req.cookies["username"];
   } else {
-    templateVars["username"] =  null
+    templateVars["username"] = null;
   }
-  console.log("test", templateVars)
+
   res.render("urls_index", templateVars);
 });
 
@@ -112,8 +121,8 @@ app.post("/urls", (req, res) => {
   res.redirect(`urls/${str}`);
 });
 
-app.post("/logout", (req,res) =>{
-  res.clearCookie("username")
-  res.redirect("/urls")
+app.post("/logout", (req, res) => {
+  res.clearCookie("username");
+  res.redirect("/urls");
 })
 
