@@ -27,7 +27,7 @@
       <tbody>
         <% if(user) { %>
           <% for (let id in urls) { %>
-            <% if (user.userId===urls[id].userID) { %>
+
               <tr>
                 <td>
                   <%= id %>
@@ -46,10 +46,9 @@
 
               </tr>
 
-              <% } %>
                 <% } %>
                   <% } else { %>
-                    <tr> <td>You have not added any url's yet!</td> </tr>
+                    <tr> <td>log in or creat and account to add urls</td> </tr>
                     <% } %>
       </tbody>
     </table>

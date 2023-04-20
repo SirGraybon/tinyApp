@@ -45,6 +45,15 @@ const findUser = function(id, obj) {
   }
   return false;
 };
+
+const getUserURLs = function(user) {
+  const userURLs = {}
+  for (const id in urlDatabase ){
+    if (urlDatabase[id].userID === user) {
+      userURLs[id] = urlDatabase[id]    }
+  }
+  return userURLs
+}
 ///////////////objects///////////////////////
 
 const urlDatabase = {
@@ -124,7 +133,7 @@ app.get("/u/:id", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { urls: getUserURLs(req.cookies["userid"]) };
   if (req.cookies) {
     templateVars["user"] = userDb[req.cookies["userid"]];
   } else {
