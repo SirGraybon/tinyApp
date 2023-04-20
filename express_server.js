@@ -1,6 +1,7 @@
 ///////////////settup//////////////////////////
 const express = require('express');
-var cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs')
 const app = express();
 app.use(cookieParser());
 const PORT = 8080;
@@ -72,11 +73,11 @@ const userDb = {
   admin1: {
     userId: "admin1",
     email: "admin@admin.com",
-    password: "admin"
+    password: bcrypt.hashSync("admin",10)
   }
 
 };
-
+console.log(userDb)
 
 //////////////////GET//////////////////////////
 
@@ -116,6 +117,8 @@ app.get("/register", (req, res) => {
   }
   res.render("register", templateVars);
 });
+
+
 app.get("/login", (req, res) => {
   const templateVars = { urls: urlDatabase };
   if (req.cookies.userid) {
@@ -189,10 +192,10 @@ app.post("/login", (req, res) => {
 
     res.status(403).send("User not yet registered");
   }
-  if (userid.password !== password) {
+  if (!bcrypt.compareSync(password, userDb[userid.userId].password)) {
     res.status(403).send("incorrect password");
   }
-  if (userid.password === password) {
+  if (bcrypt.compareSync(password, userDb[userid.userId].password)) {
     res.cookie("userid", userid.userId);
     res.redirect("/urls");
   }
@@ -229,8 +232,9 @@ app.post("/register", (req, res) => {
   userDb[userId] = {
     userId: userId,
     email,
-    password,
+    password: bcrypt.hashSync(password,10)
   };
+  console.log(userDb)
   res.cookie("userid", userId);
   res.redirect("/urls");
 
