@@ -37,10 +37,10 @@ const generateRandomString = function() {
   return string;
 };
 
-const findUser = function(id) {
-  for (const users in userDb) {
-    if (userDb[users].email === id) {
-      return userDb[users];
+const findUser = function(id, obj) {
+  for (const users in obj) {
+    if (obj[users].email === id) {
+      return obj[users];
     }
   }
   return false;
@@ -48,11 +48,22 @@ const findUser = function(id) {
 ///////////////objects///////////////////////
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2":{
+    longURL: "http://www.lighthouselabs.ca",
+    userID: "admin1"
+  },
+  "9sm5xK": {
+    longURL: "http://www.google.com",
+    userID: "admin1"
+  }  
 };
 
 const userDb = {
+  admin1: {
+    userId: "admin1",
+    email: "admin@admin.com",
+    password: "admin"
+  }
 
 };
 
@@ -61,16 +72,17 @@ const userDb = {
 
 app.get("/urls/new", (req, res) => {
   const templateVars = { urls: urlDatabase };
-  if (req.cookies) {
+  if (req.cookies.userid) {
     templateVars["user"] = userDb[req.cookies["userid"]];
+    res.render("urls_new", templateVars);
   } else {
     templateVars["user"] = null;
+    res.redirect(`/login`);
   }
-  res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { urls: urlDatabase, id: req.params.id, longURL: urlDatabase[req.params.id] };
+  const templateVars = { urls: urlDatabase, id: req.params.id, longURL: urlDatabase[req.params.id].longURL };
   if (req.cookies) {
     templateVars["user"] = userDb[req.cookies["userid"]];
   } else {
@@ -81,8 +93,8 @@ app.get("/urls/:id", (req, res) => {
 
 app.get("/register", (req, res) => {
   const templateVars = { urls: urlDatabase };
-  if (req.cookies) {
-    templateVars["user"] = userDb[req.cookies["userid"]];
+  if (req.cookies.userid) {
+    res.redirect(`/urls`);
   } else {
     templateVars["user"] = null;
   }
@@ -90,8 +102,9 @@ app.get("/register", (req, res) => {
 });
 app.get("/login", (req, res) => {
   const templateVars = { urls: urlDatabase };
-  if (req.cookies) {
-    templateVars["user"] = userDb[req.cookies["userid"]];
+  if (req.cookies.userid) {
+
+    res.redirect(`/urls`);
   } else {
     templateVars["user"] = null;
   }
@@ -99,8 +112,15 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
-  res.redirect(longURL);
+  const longURL = urlDatabase[req.params.id].longURL;
+  console.log(req.params)
+  if (longURL) {    
+    res.redirect(longURL);
+  } else {
+    console.log("doesnt exist")
+    res.status(400).send("url not in database")
+
+  }
 });
 
 app.get("/urls", (req, res) => {
@@ -128,22 +148,27 @@ app.get("/urls", (req, res) => {
 // });
 
 app.post("/urls/:id/delete", (req, res) => {
-
+  if (req.cookies.userid) {
   delete urlDatabase[req.params.id];
-
   res.redirect(`/urls`);
+  } else {
+    res.status(400).send("Must be logged in to delete url's")
+  }
 });
 
 app.post("/urls/:id/edit", (req, res) => {
+  if (req.cookies.userid) {
 
-  urlDatabase[req.params.id] = req.body.longURL;
-
+  urlDatabase[req.params.id].longURL = req.body.longURL;
   res.redirect(`/urls`);
+  } else {
+    res.status(400).send("Must be logged in to edit url's")
+  }
 });
 
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  let userid = findUser(email);
+  let userid = findUser(email, userDb);
   if (userid === false) {
 
     res.status(403).send("User not yet registered");
@@ -158,9 +183,15 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  let str = generateRandomString();
-  urlDatabase[str] = req.body.longURL;
-  res.redirect(`urls/${str}`);
+  if (req.cookies.userid) {
+
+    let str = generateRandomString();
+    urlDatabase[str] = {longURL: req.body.longURL,
+    userID: req.cookies.userid}
+    res.redirect(`urls/${str}`);
+  } else {
+    res.status(400).send("Must be logged in to add shorten url's")
+  }
 });
 
 app.post("/logout", (req, res) => {
@@ -174,7 +205,7 @@ app.post("/register", (req, res) => {
   if (!email || !password) {
     res.status(400).send("please enter email and password");
   }
-  if (findUser(email)) {
+  if (findUser(email, userDb)) {
     res.status(400).send("User already exists");
   }
 
