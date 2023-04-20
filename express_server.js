@@ -5,7 +5,7 @@ const cookieSession = require('cookie-session')
 const bcrypt = require('bcryptjs')
 const app = express();
 const PORT = 8080;
-//const generateRandomString = require('./generator')
+const {generateRandomString, findUser, getUserURLs} = require('./functions')
 app.set("view engine", "ejs");
 app.listen(PORT, () => {
   console.log(`example app started on port: ${PORT}`);
@@ -23,44 +23,44 @@ app.use(cookieSession({
 //ngrok
 
 ///////////////Functions///////////////////////
-const generateRandomString = function() {
-  let string = "";
-  for (let i = 6; i > 0; i--) {
-    let setter = Math.floor(Math.random() * 3);
-    if (setter === 0) {
-      let charCodeIndex = Math.floor(Math.random() * (58 - 48) + 48);
-      string += String.fromCharCode(charCodeIndex);
-    }
-    if (setter === 1) {
-      let charCodeIndex = Math.floor(Math.random() * (91 - 65) + 65);
-      string += String.fromCharCode(charCodeIndex);
+// const generateRandomString = function() {
+//   let string = "";
+//   for (let i = 6; i > 0; i--) {
+//     let setter = Math.floor(Math.random() * 3);
+//     if (setter === 0) {
+//       let charCodeIndex = Math.floor(Math.random() * (58 - 48) + 48);
+//       string += String.fromCharCode(charCodeIndex);
+//     }
+//     if (setter === 1) {
+//       let charCodeIndex = Math.floor(Math.random() * (91 - 65) + 65);
+//       string += String.fromCharCode(charCodeIndex);
 
-    }
-    if (setter === 2) {
-      let charCodeIndex = Math.floor(Math.random() * (123 - 97) + 97);
-      string += String.fromCharCode(charCodeIndex);
-    }
-  }
-  return string;
-};
+//     }
+//     if (setter === 2) {
+//       let charCodeIndex = Math.floor(Math.random() * (123 - 97) + 97);
+//       string += String.fromCharCode(charCodeIndex);
+//     }
+//   }
+//   return string;
+// };
 
-const findUser = function(id, obj) {
-  for (const users in obj) {
-    if (obj[users].email === id) {
-      return obj[users];
-    }
-  }
-  return false;
-};
+// const findUser = function(id, obj) {
+//   for (const users in obj) {
+//     if (obj[users].email === id) {
+//       return obj[users];
+//     }
+//   }
+//   return false;
+// };
 
-const getUserURLs = function(user) {
-  const userURLs = {}
-  for (const id in urlDatabase ){
-    if (urlDatabase[id].userID === user) {
-      userURLs[id] = urlDatabase[id]    }
-  }
-  return userURLs
-}
+// const getUserURLs = function(user) {
+//   const userURLs = {}
+//   for (const id in urlDatabase ){
+//     if (urlDatabase[id].userID === user) {
+//       userURLs[id] = urlDatabase[id]    }
+//   }
+//   return userURLs
+// }
 ///////////////objects///////////////////////
 
 const urlDatabase = {
@@ -91,18 +91,14 @@ app.get("/urls/new", (req, res) => {
   if (req.session.userid) {
     templateVars["user"] = userDb[req.session["userid"]];
     res.render("urls_new", templateVars);
-  } else {
-
+  } 
     res.redirect(`/login`);
-  }
-});
+  });
 
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { urls: urlDatabase, id: req.params.id, longURL: urlDatabase[req.params.id].longURL };
+  const templateVars = { urls: urlDatabase, id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user:  null };
   if (req.session) {
     templateVars["user"] = userDb[req.session["userid"]];
-  } else {
-    templateVars["user"] = null;
   }
   if (req.session["userid"] !== urlDatabase[req.params.id].userID) {
 
@@ -114,23 +110,18 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { urls: urlDatabase, user: null };
   if (req.session.userid) {
     res.redirect(`/urls`);
-  } else {
-    templateVars["user"] = null;
   }
   res.render("register", templateVars);
 });
 
 
 app.get("/login", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { urls: urlDatabase, user:  null };
   if (req.session.userid) {
-
     res.redirect(`/urls`);
-  } else {
-    templateVars["user"] = null;
   }
   res.render("login", templateVars);
 });
@@ -148,28 +139,15 @@ app.get("/u/:id", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: getUserURLs(req.session["userid"]) };
+  const templateVars = { urls: getUserURLs(req.session["userid"], urlDatabase), user:  null };
   if (req.session) {
     templateVars["user"] = userDb[req.session["userid"]];
-  } else {
-    templateVars["user"] = null;
-  }
+  } 
   res.render("urls_index", templateVars);
 });
 
 
 ///////////////////POST////////////////////////
-// app.post("/urls/:id", (req, res) => {
-
-//   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
-
-//   if (req.cookies) {
-//     templateVars["user"] = userDb[req.cookies["userid"]];
-//   } else {
-//     templateVars["user"] = null;
-//   }
-//   res.redirect("urls_show", templateVars);
-// });
 
 app.post("/urls/:id/delete", (req, res) => {
   if (req.session.userid) {
