@@ -14,6 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 ///////////////////notes///////////////////////
 // currentUser variable read form cookie
+//ngrok
 
 ///////////////Functions///////////////////////
 const generateRandomString = function() {
@@ -96,6 +97,12 @@ app.get("/urls/:id", (req, res) => {
     templateVars["user"] = userDb[req.cookies["userid"]];
   } else {
     templateVars["user"] = null;
+  }
+  if (req.cookies["userid"] !== urlDatabase[req.params.id].userID) {
+
+    console.log ("Cookie user id", req.cookies["userid"] )
+    console.log ("params id", req.params.id)
+    res.status(400).send("This page belongs to another user")
   }
   res.render("urls_show", templateVars);
 });
