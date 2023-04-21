@@ -2,6 +2,7 @@
 const express = require('express');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
+const methodOverride = require('method-override')
 const app = express();
 const PORT = 8080;
 const { generateRandomString, findUser, getUserURLs } = require('./functions');
@@ -11,6 +12,7 @@ app.use(cookieSession({
   name: "session",
   keys: ['123', '456', '789']
 }));
+app.use(methodOverride('_method'))
 app.listen(PORT, () => {
   console.log(`example app started on port: ${PORT}`);
 });
@@ -104,7 +106,7 @@ app.get("/urls", (req, res) => {
 
 ///////////////////POST_REQUESTS////////////////////////
 
-app.post("/urls/:id/delete", (req, res) => {
+app.delete("/urls/:id", (req, res) => {
   if (req.session.userid) {
     delete urlDatabase[req.params.id];
     res.redirect(`/urls`);
@@ -113,7 +115,7 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 });
 
-app.post("/urls/:id/edit", (req, res) => {
+app.put("/urls/:id", (req, res) => {
   if (req.session.userid) {
 
     urlDatabase[req.params.id].longURL = req.body.longURL;

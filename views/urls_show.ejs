@@ -20,7 +20,7 @@
           <%= id %>
         </a>
       </p>
-      <form action="/urls/<%=id%>/edit" method="POST">
+      <form action="/urls/<%=id%>?_method=PUT" method="POST">
         <h5 class="form-group mb-2">
           <label for="longURL">Edit URL:</label>
           <input type="text" name="longURL" placeholder="http://" style="width: 300px; margin: 1em" />
