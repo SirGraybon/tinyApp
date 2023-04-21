@@ -24,7 +24,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Planned updates
 - Improved styling via CSS
-- Method overrides to follow the REST conventions
+- ~~Method overrides to follow the REST conventions~~
 - Analytics for product usage and url visits
 
 
