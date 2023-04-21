@@ -40,7 +40,7 @@ const userDb = {
     password: bcrypt.hashSync("admin", 10)
   }
 };
-console.log(userDb);
+
 
 //////////////////GET_REQUESTS//////////////////////////
 
@@ -178,7 +178,6 @@ app.post("/register", (req, res) => {
     email,
     password: bcrypt.hashSync(password, 10)
   };
-  console.log(userDb);
   req.session.userid = userId;
   res.redirect("/urls");
 
