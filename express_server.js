@@ -1,21 +1,19 @@
-///////////////settup//////////////////////////
+///////////////set-tup//////////////////////////
 const express = require('express');
-const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080;
 const { generateRandomString, findUser, getUserURLs } = require('./functions');
 app.set("view engine", "ejs");
-app.listen(PORT, () => {
-  console.log(`example app started on port: ${PORT}`);
-});
 app.use(express.urlencoded({ extended: true }));
-//app.use(cookieParser());
 app.use(cookieSession({
   name: "session",
   keys: ['123', '456', '789']
 }));
+app.listen(PORT, () => {
+  console.log(`example app started on port: ${PORT}`);
+});
 
 
 ///////////////////notes///////////////////////
@@ -35,18 +33,16 @@ const urlDatabase = {
     userID: "admin1"
   }
 };
-
 const userDb = {
   admin1: {
     userId: "admin1",
     email: "admin@admin.com",
     password: bcrypt.hashSync("admin", 10)
   }
-
 };
 console.log(userDb);
 
-//////////////////GET//////////////////////////
+//////////////////GET_REQUESTS//////////////////////////
 
 app.get("/urls/new", (req, res) => {
   const templateVars = { urls: urlDatabase, user: null };
@@ -58,6 +54,10 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
+  if (urlDatabase[req.params.id] === undefined) {
+
+    return res.status(400).send("URL not in database");
+  }
   const templateVars = { urls: urlDatabase, id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user: null };
   if (req.session) {
     templateVars["user"] = userDb[req.session["userid"]];
@@ -76,7 +76,6 @@ app.get("/register", (req, res) => {
   }
   res.render("register", templateVars);
 });
-
 
 app.get("/login", (req, res) => {
   const templateVars = { urls: urlDatabase, user: null };
@@ -104,8 +103,7 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-
-///////////////////POST////////////////////////
+///////////////////POST_REQUESTS////////////////////////
 
 app.post("/urls/:id/delete", (req, res) => {
   if (req.session.userid) {
@@ -132,7 +130,7 @@ app.post("/login", (req, res) => {
   if (userid === false) {
 
     res.status(403).send("User not yet registered");
-    
+
   } else {
 
     if (!bcrypt.compareSync(password, userDb[userid.userId].password)) {

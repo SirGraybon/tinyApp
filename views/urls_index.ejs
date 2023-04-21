@@ -28,28 +28,30 @@
         <% if(user) { %>
           <% for (let id in urls) { %>
 
-              <tr>
-                <td>
-                  <%= id %>
-                </td>
-                <td>
-                  <%= urls[id].longURL %>
-                </td>
-                <td>
-                  <form method="POST" action="/urls/<%=id%>/delete"><button type="submit"
-                      class="btn btn-primary">Delete</button></form>
-                </td>
-                <td>
-                  <form method="get" action="/urls/<%=id%>"><button type="submit" class="btn btn-primary">View and
-                      Edit</button></form>
-                </td>
+            <tr>
+              <td>
+                <%= id %>
+              </td>
+              <td>
+                <%= urls[id].longURL %>
+              </td>
+              <td>
+                <form method="POST" action="/urls/<%=id%>/delete"><button type="submit"
+                    class="btn btn-primary">Delete</button></form>
+              </td>
+              <td>
+                <form method="get" action="/urls/<%=id%>"><button type="submit" class="btn btn-primary">View and
+                    Edit</button></form>
+              </td>
 
-              </tr>
+            </tr>
 
+            <% } %>
+              <% } else { %>
+                <tr>
+                  <td>log in or create and account to add urls</td>
+                </tr>
                 <% } %>
-                  <% } else { %>
-                    <tr> <td>log in or create and account to add urls</td> </tr>
-                    <% } %>
       </tbody>
     </table>
   </main>
